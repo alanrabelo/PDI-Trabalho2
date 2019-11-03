@@ -69,10 +69,8 @@ class MorphologyManager:
         a.set_title('Retangulo 20px x 5px')
         plt.axis('off')
 
-
         plt.tight_layout()
         plt.show()
-
 
     def erode_image(self, structuring_elements, image):
 
