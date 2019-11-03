@@ -20,19 +20,19 @@ class CV2Manager:
 
         rotacao1 = cv2.getRotationMatrix2D(ponto, 90, 1.0)
         rotacionado1 = cv2.warpAffine(self.img, rotacao1, (largura, altura))
-        imsave(self.plot_folder+'rotation-90-'+filename, rotacionado1)
+        imsave(self.plot_folder+'rotation-90-'+self.filename, rotacionado1)
 
         rotacao2 = cv2.getRotationMatrix2D(ponto, 120, 1.0)
         rotacionado2 = cv2.warpAffine(self.img, rotacao2, (largura, altura))
-        imsave(self.plot_folder+'rotation-120-'+filename, rotacionado2)
+        imsave(self.plot_folder+'rotation-120-'+self.filename, rotacionado2)
 
         translation_matrix = np.float32([[1, 0, 70], [0, 1, 110]])
-        img_translation = cv2.warpAffine(self.img, translation_matrix, (altura, largura))
-        imsave(self.plot_folder+'translação-'+filename, img_translation)
+        img_translation = cv2.warpAffine(self.img, translation_matrix, (largura, altura))
+        imsave(self.plot_folder+'tranlation-'+self.filename, img_translation)
 
         rotacao1 = cv2.getRotationMatrix2D(ponto, 45, 0.5)
         rotacionado1 = cv2.warpAffine(self.img, rotacao1, (largura, altura))
-        imsave(self.plot_folder+'rotação-45-tamanho-'+filename, rotacionado1)
+        imsave(self.plot_folder+'rotation-45-tamanho-'+self.filename, rotacionado1)
 
 images = [
     'apple-1.gif',
