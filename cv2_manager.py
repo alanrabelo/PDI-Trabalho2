@@ -5,6 +5,8 @@ from skimage.io import imread, imsave
 import math
 import matplotlib.pyplot as plt
 import pywt
+from skimage import morphology
+from skimage.morphology import disk, square, cube, diamond, rectangle, ball, star
 
 class CV2Manager:
 
@@ -73,7 +75,7 @@ class CV2Manager:
 
         imsave(plot_folder+'hough-lines'+self.filename, cdst)
 
-    def wavelet(self, plot_folder='Plots/Hough/'):
+    def wavelet(self, plot_folder='Plots/Haar/'):
         img_haar = pywt.dwt2(self.img, 'haar')
         cA, (cH, cV, cD) = img_haar
 
@@ -91,8 +93,7 @@ class CV2Manager:
         plt.subplot(224)
         plt.imshow(cD, 'gray')
         plt.title('Diagonais')
-        plt.show()
-        plt.savefig(plot_folder+'wavelet'+self.filename)
+        plt.savefig(plot_folder+'haar'+self.filename)
 
     def plotResult(self, result, title, folder):
         fig = plt.figure(figsize=(8, 3.5), dpi=150)
@@ -124,6 +125,50 @@ class CV2Manager:
 
         # cv2.imwrite('./Results/{}-kmeans.png'.format(self.name_file), result)
 
+    def getMarkers(self, m, n):
+        markers = np.zeros([m, n])
+        # Center
+        m = int(m / 2)
+        n = int(n / 2)
+        markers[20:40, 20:40] = 200
+        markers[m:m + 20, n:n + 20] = 100
+
+        return markers
+
+    def watershed(self, title):
+        image = self.img
+        image_ext = morphology.dilation(image, disk(5)) - image
+
+        m, n = image.shape
+        markers = self.getMarkers(m, n)
+        ws = morphology.watershed(image_ext, markers)
+
+        cv2.imwrite('./Results/{}-ws-external-dilation.png'.format(title), 255 - image_ext)
+        cv2.imwrite('./Results/{}-ws-markers.png'.format(title), markers)
+        cv2.imwrite('./Results/{}-ws.png'.format(title), ws)
+        self.plotWatershed(image, 255 - image_ext, markers, ws)
+
+    def plotWatershed(self, image, dilation, markers, watershed, plot_folder='Plots/Watershed/'):
+        fig, (ax0, ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=4, figsize=(8, 2.5), sharex=True, sharey=True)
+
+        ax0.imshow(image, cmap=plt.get_cmap('gray'))
+        ax0.set_title('Original')
+        ax0.axis('off')
+
+        ax1.imshow(dilation, cmap=plt.get_cmap('gray'))
+        ax1.set_title('External Dilation')
+        ax1.axis('off')
+
+        ax2.imshow(markers, cmap=plt.get_cmap('gray'))
+        ax2.set_title('Markers')
+        ax2.axis('off')
+
+        ax3.imshow(watershed, cmap=plt.get_cmap('nipy_spectral'), interpolation='nearest')
+        ax3.set_title('Watershed')
+        ax3.axis('off')
+
+        fig.tight_layout()
+        plt.savefig(plot_folder+'watershed'+self.filename)
 
 images = [
     'apple-1.gif',
@@ -141,4 +186,6 @@ for filename in gs_images:
     # manager.houghCircles()
     # manager.houghLines()
     # manager.rotate_and_translate_image()
-    manager.fourier()
+    # manager.fourier()
+    # manager.wavelet()
+    manager.watershed(filename)
